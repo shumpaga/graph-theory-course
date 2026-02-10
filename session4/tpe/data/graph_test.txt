@@ -1,0 +1,19 @@
+// Graphe de test principal - Cotonou simplifié
+// 0=Ganhi  1=Dantokpa  2=Cadjehoun  3=Akpakpa  4=Fidjrosse
+//
+// Distances depuis 0 : [0, 2, 5, 6, 11]
+//   0→0 : 0
+//   0→1 : 2 (direct)
+//   0→2 : 5 (0→1→2 = 2+3)
+//   0→3 : 6 (0→1→2→3 = 2+3+1)
+//   0→4 : 11 (0→1→2→3→4 = 2+3+1+5)
+//
+// BFS de 0 à 2 trouve 0→2 (1 arête, coût 10)
+// Optimal : 0→1→2 (2 arêtes, coût 5)
+5 6
+0 1 2
+0 2 10
+1 2 3
+1 3 8
+2 3 1
+3 4 5
