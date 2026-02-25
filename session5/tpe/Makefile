@@ -71,7 +71,7 @@ help:
 	@echo "  make          - Compile le programme principal"
 	@echo "  make all      - Même chose que 'make'"
 	@echo "  make run      - Compile et exécute le programme interactif"
-	@echo "  make test     - Compile et lance les 16 tests automatiques"
+	@echo "  make test     - Compile et lance les 20 tests automatiques"
 	@echo "  make clean    - Supprime les fichiers objets et exécutables"
 	@echo "  make help     - Affiche cette aide"
 	@echo ""

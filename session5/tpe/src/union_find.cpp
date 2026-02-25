@@ -1,87 +1,72 @@
-/**
- * @file union_find.cpp
- * @brief Implémentation de la structure Union-Find
- *
- * TPE5 - Théorie des Graphes (GI2)
- * ESGC VERECHAGUINE A.K. - 2025-2026
- *
- * NOM    :
- * PRENOM :
- *
- * 3 fonctions à implémenter :
- *   - find()      : recherche avec compression de chemin
- *   - unite()     : fusion par rang
- *   - connected() : test de connexité
- */
-
 #include "union_find.h"
 
+// NOM    :
+// PRENOM :
+// TPE5 - Union-Find (progression en 6 étapes)
+
 // ============================================================
-// CONSTRUCTEUR (fourni)
+// ÉTAPE 1 : UNION-FIND NAÏF (4 points)
+// Objectif : version simple qui MARCHE, sans optimisation
 // ============================================================
 
 UnionFind::UnionFind(int n) : parent(n), rank_(n, 0) {
-    for (int i = 0; i < n; i++) {
-        parent[i] = i;
-    }
+    // TODO : Initialiser parent[i] = i pour tout i de 0 à n-1
+    //        (chaque élément est son propre chef)
 }
-
-// ============================================================
-// ÉTAPE 1 : FIND AVEC COMPRESSION DE CHEMIN (2 pts)
-// ============================================================
 
 int UnionFind::find(int x) {
-    // TODO: Implémenter find avec compression de chemin
-    //
-    // Algorithme :
-    //   si parent[x] != x :
-    //       parent[x] = find(parent[x])   // COMPRESSION
-    //   retourner parent[x]
-    //
-    // La compression fait pointer chaque noeud directement vers la racine,
-    // ce qui accélère les futurs appels à find().
+    // ----------------------------------------------------------
+    // ÉTAPE 1 (NAÏF) : boucle while simple
+    // TODO : Tant que parent[x] != x, faire x = parent[x]
+    // TODO : Retourner x
+    // ----------------------------------------------------------
+    // ÉTAPE 3 (COMPRESSION) : REMPLACER le while ci-dessus par :
+    // TODO : Si parent[x] == x, retourner x
+    // TODO : parent[x] = find(parent[x])   <- LA ligne magique
+    // TODO : Retourner parent[x]
+    // ----------------------------------------------------------
 
-    return x; // À remplacer
+    return x; // placeholder
 }
-
-// ============================================================
-// ÉTAPE 2 : UNION PAR RANG (2.5 pts)
-// ============================================================
 
 void UnionFind::unite(int x, int y) {
-    // TODO: Implémenter l'union par rang
-    //
-    // Algorithme :
-    //   rx = find(x)
-    //   ry = find(y)
-    //   si rx == ry : ne rien faire (déjà dans le même ensemble)
-    //
-    //   si rank_[rx] < rank_[ry] :
-    //       parent[rx] = ry
-    //   sinon si rank_[rx] > rank_[ry] :
-    //       parent[ry] = rx
-    //   sinon :
-    //       parent[ry] = rx
-    //       rank_[rx]++
+    // ----------------------------------------------------------
+    // ÉTAPE 1 (NAÏF) : rattachement arbitraire
+    // TODO : rx = find(x), ry = find(y)
+    // TODO : Si rx == ry, return (déjà dans le même groupe)
+    // TODO : parent[ry] = rx  (choix arbitraire)
+    // ----------------------------------------------------------
+    // ÉTAPE 4 (RANG) : REMPLACER parent[ry]=rx par :
+    // TODO : Si rank_[rx] < rank_[ry] : parent[rx] = ry
+    // TODO : Sinon si rank_[rx] > rank_[ry] : parent[ry] = rx
+    // TODO : Sinon : parent[ry] = rx ET rank_[rx]++
+    // ----------------------------------------------------------
 
-    (void)x; (void)y; // Supprimez cette ligne
+    (void)x; (void)y; // placeholder — supprimez cette ligne
 }
-
-// ============================================================
-// ÉTAPE 2 : CONNECTED (1.5 pts)
-// ============================================================
 
 bool UnionFind::connected(int x, int y) {
-    // TODO: Vérifier si x et y sont dans le même ensemble
-    //
-    // Indice : utiliser find() !
+    // TODO : Retourner find(x) == find(y)
 
-    (void)x; (void)y; // Supprimez cette ligne
-    return false; // À remplacer
+    (void)x; (void)y; // placeholder — supprimez cette ligne
+    return false; // placeholder
 }
 
 // ============================================================
-// ACCESSEUR (fourni)
+// ÉTAPE 2 : MESURER LE PROBLÈME (2 points)
+// ============================================================
+
+int UnionFind::count_operations(int x) {
+    // TODO : Comme find() naïf, mais COMPTER le nombre de
+    //        remontées (x = parent[x]) et retourner le compteur
+    // ATTENTION : NE PAS modifier parent[] ici !
+
+    (void)x; // placeholder — supprimez cette ligne
+    return 0; // placeholder
+}
+
+// ============================================================
+// ACCESSEUR (fourni — ne pas modifier)
 // ============================================================
 
 int UnionFind::getParent(int x) const {

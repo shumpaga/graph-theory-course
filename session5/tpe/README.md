@@ -9,22 +9,33 @@
 
 ---
 
-## 🎯 Objectifs
+## Mission
 
-Dans ce TPE, vous allez implémenter l'algorithme de **Kruskal** pour trouver l'**Arbre Couvrant Minimal** (Minimum Spanning Tree) d'un graphe pondéré. Pour cela, vous devrez d'abord construire la structure **Union-Find** (Disjoint Set Union) qui est au coeur de Kruskal :
+Vous travaillez pour la **SBEE** (Société Béninoise d'Énergie Électrique). Votre mission : trouver le réseau électrique de **coût minimal** reliant tous les villages d'une commune.
 
-1. **Étape 1** : Construire l'Union-Find (constructeur + find avec compression)
-2. **Étape 2** : Compléter l'Union-Find (unite par rang + connected)
-3. **Étape 3** : Extraire les arêtes du graphe (sans doublons)
-4. **Étape 4** : Implémenter l'algorithme de Kruskal
-5. **Étape 5** : Utilitaires : poids total et affichage du MST
+**Approche** : on commence par une version **naïve** qui marche. Puis on mesure ses limites. Puis on l'améliore, **une optimisation à la fois**.
 
 ---
 
-## 📁 Structure du Projet
+## Les 6 Étapes
+
+| Étape | Objectif | Points | Philosophie |
+|-------|----------|--------|-------------|
+| 1 | Union-Find naïf | 4 | Comprendre la structure de base |
+| 2 | Mesurer le problème | 2 | Voir POURQUOI c'est lent |
+| 3 | Compression de chemin | 4 | Première optimisation : find rapide |
+| 4 | Union par rang | 3 | Deuxième optimisation : arbres plats |
+| 5 | Algorithme de Kruskal | 7 | L'algorithme principal du MST |
+| 6 | Affichage & utilitaires | 2 | Afficher le résultat joliment |
+| — | Qualité code | +3 | Commentaires, nommage, clarté |
+| **TOTAL** | | **25** | **20 tests** |
+
+---
+
+## Structure du Projet
 
 ```
-session5/tpe/
+session5/student/
 ├── README.md                  ← Ce fichier
 ├── Makefile                   ← Compilation
 ├── include/
@@ -33,11 +44,11 @@ session5/tpe/
 │   └── mst.h                 ✓ Déclarations MST + struct Edge (fourni)
 ├── src/
 │   ├── graph.cpp             ✓ Implémentation Graph (fourni)
-│   ├── union_find.cpp        ⚠️ À COMPLÉTER (3 fonctions)
-│   ├── mst.cpp               ⚠️ À COMPLÉTER (4 fonctions)
+│   ├── union_find.cpp        ⚠️ À COMPLÉTER (étapes 1-4)
+│   ├── mst.cpp               ⚠️ À COMPLÉTER (étapes 5-6)
 │   └── main.cpp              ✓ Menu interactif (fourni)
 ├── tests/
-│   └── test_mst.cpp          ✓ 16 tests automatiques
+│   └── test_mst.cpp          ✓ 20 tests automatiques
 ├── data/
 │   ├── graph_test.txt        ✓ 7 sommets (A-G), 11 arêtes
 │   └── graph_commune.txt     ✓ 10 villages, 18 routes
@@ -48,18 +59,18 @@ session5/tpe/
 
 ---
 
-## 🚀 Compilation et Tests
+## Compilation et Tests
 
 ### Compilation
 ```bash
 make clean       # Nettoyer
-make             # Compiler le programme principal (./main)
-make test        # Compiler et lancer les 16 tests
+make             # Compiler le programme principal
+make test        # Compiler et lancer les 20 tests
 ```
 
 ### Exécution
 ```bash
-# Tests automatiques (16 tests)
+# Tests automatiques (20 tests)
 ./test_mst
 
 # Programme interactif
@@ -73,32 +84,32 @@ make help        # Liste des commandes disponibles
 
 ---
 
-## 📝 Fonctions à Implémenter
+## Fonctions à Implémenter
 
-### Fichier : `src/union_find.cpp` (3 fonctions)
-
-| Étape | Fonction | Points | Description |
-|-------|----------|--------|-------------|
-| 1 | `find(x)` | 2 | Recherche avec compression de chemin |
-| 2 | `unite(x, y)` | 2.5 | Fusion par rang |
-| 2 | `connected(x, y)` | 1.5 | Test de connexité via find |
-
-### Fichier : `src/mst.cpp` (4 fonctions)
+### Fichier : `src/union_find.cpp` (étapes 1-4)
 
 | Étape | Fonction | Points | Description |
 |-------|----------|--------|-------------|
-| 3 | `getEdges(g)` | 4 | Extraire les arêtes sans doublons |
-| 4 | `kruskal(g)` | 8 | Algorithme de Kruskal complet |
-| 5 | `mstWeight(mst)` | 1.5 | Somme des poids du MST |
-| 5 | `printMST(mst, g)` | 1.5 | Affichage avec noms de sommets |
+| 1 | `UnionFind(n)` | — | Constructeur : `parent[i] = i` |
+| 1 | `find(x)` naïf | 4 | Boucle while (pas d'optimisation) |
+| 1 | `unite(x, y)` naïf | — | `parent[ry] = rx` (arbitraire) |
+| 1 | `connected(x, y)` | — | `find(x) == find(y)` |
+| 2 | `count_operations(x)` | 2 | Compter les remontées de find |
+| 3 | `find(x)` compressé | 4 | Remplacer while par récursion + compression |
+| 4 | `unite(x, y)` par rang | 3 | Comparer `rank_[]`, petit sous grand |
 
-| | Qualité du code | +2 | Commentaires, nommage, indentation |
+### Fichier : `src/mst.cpp` (étapes 5-6)
 
-**Total : 23 points + 2 bonus = 25 points**
+| Étape | Fonction | Points | Description |
+|-------|----------|--------|-------------|
+| 5 | `getEdges(g)` | 7 | Extraire les arêtes sans doublons (`u < v`) |
+| 5 | `kruskal(g)` | — | Tri + Union-Find → MST |
+| 6 | `mstWeight(mst)` | 2 | Somme des poids du MST |
+| 6 | `printMST(mst, g)` | — | Affichage avec noms de sommets |
 
 ---
 
-## 📊 Fichiers de Données
+## Fichiers de Données
 
 ### `data/graph_test.txt` — Graphe TD5 (7 sommets)
 ```
@@ -116,20 +127,20 @@ MST attendu : poids = 44, 9 arêtes
 
 ---
 
-## ⚠️ Pièges Fréquents
+## Pièges Fréquents
 
 | # | Piège | Solution |
 |---|-------|----------|
-| 1 | Doublons dans getEdges | Ne garder que `u < v` pour éviter les doublons |
-| 2 | Oublier la compression dans find | `parent[x] = find(parent[x])` — sinon O(n) au lieu de O(α(n)) |
-| 3 | Union sans vérifier find | Toujours comparer les **racines**, pas x et y directement |
-| 4 | Arêtes non triées avant Kruskal | `std::sort` avec lambda sur le poids |
-| 5 | Oublier de vérifier `connected()` | Sans ce test, Kruskal ajoute des cycles ! |
-| 6 | MST sur graphe déconnecté | Normal d'avoir < V-1 arêtes (forêt couvrante) |
+| 1 | Oublier `parent[i] = i` dans constructeur | find() retourne n'importe quoi |
+| 2 | Oublier `rx == ry` dans unite | Crée des boucles infinies |
+| 3 | Compression sans récursion | `parent[x] = find(parent[x])` récursif |
+| 4 | Tri dans le mauvais sens | `a.weight < b.weight` (croissant !) |
+| 5 | Doublons dans getEdges | Ne garder que `u < v` |
+| 6 | Modifier parent dans count_operations | Juste compter, NE PAS modifier ! |
 
 ---
 
-## 🎓 Rappel : Algorithme de Kruskal
+## Rappel : Algorithme de Kruskal
 
 ```
 1. Extraire et trier toutes les arêtes par poids croissant
@@ -141,42 +152,38 @@ MST attendu : poids = 44, 9 arêtes
 4. Retourner le MST
 ```
 
-**Complexité** : O(E log E) pour le tri + O(E × α(V)) pour les opérations Union-Find ≈ **O(E log E)**
+**Complexité** : O(E log E) pour le tri + O(E × α(V)) pour Union-Find ≈ **O(E log E)**
 
 ---
 
-## 🧪 Tests Automatiques
+## Tests Automatiques
 
 ```bash
 ./test_mst
 ```
 
-**Sortie attendue (16 tests)** :
+**Sortie attendue (20 tests)** :
 ```
-═══════════════════════════════════════════════
-  TESTS TPE5 - KRUSKAL & UNION-FIND
-═══════════════════════════════════════════════
+=== TPE5 : Tests MST (Kruskal & Union-Find) ===
 
-=== ÉTAPE 1 : UNION-FIND — CONSTRUCTEUR & FIND ===
-  ✅ Test 1 : Constructeur : parent[i] == i pour 5 éléments
-  ✅ Test 2 : find(i) == i initialement pour tout i
-  ✅ Test 3 : Éléments distincts non connectés initialement
+--- Étape 1 : Union-Find naïf ---
+  [PASS] test_uf_create_find_self
+  [PASS] test_uf_create_not_connected
   ...
 
-  TOTAL : 16/16 tests passés
-  NOTE ESTIMÉE : 23/25 pts (+ qualité code : +2 pts)
+=== Résultat : 20/20 tests réussis ===
 ```
 
 ---
 
-## 📚 Documentation Complète
+## Documentation Complète
 
 - **Algorithmes détaillés** : [docs/ENONCE.md](docs/ENONCE.md)
 - **Barème de notation** : [docs/BAREME.md](docs/BAREME.md)
 
 ---
 
-## 📦 Rendu
+## Rendu
 
 ### Format
 - **Fichier** : `NOM_Prenom_TPE5.zip`
@@ -184,24 +191,25 @@ MST attendu : poids = 44, 9 arêtes
 - **Deadline** : Début Séance 6
 
 ### Checklist
-- [ ] Les **7** fonctions sont implémentées (3 dans union_find.cpp + 4 dans mst.cpp)
+- [ ] Les **6 étapes** sont implémentées
 - [ ] Code compile : `make clean && make test`
-- [ ] Tests passent : viser 16/16
+- [ ] Tests passent : viser 20/20
 - [ ] Nom/Prénom en haut de `union_find.cpp` et `mst.cpp`
-- [ ] Code commenté (étapes clés + complexité documentée)
+- [ ] Code commenté (surtout : compression et rang)
 - [ ] Capture montre résultats de `./test_mst`
 
 ---
 
-## 💡 Conseils
+## Conseils
 
-1. **Procéder étape par étape** : 1 → 2 → 3 → 4 → 5
-2. **Tester fréquemment** : `make test` après chaque fonction
-3. **Lire ENONCE.md** : Algorithmes détaillés avec pseudocode
-4. **Commencer par Union-Find** : Kruskal en dépend entièrement
-5. **Dessiner le graphe** : Tracer le MST à la main d'abord
-6. **`u < v` pour getEdges** : C'est LE piège de l'étape 3
+1. **Étape 1 d'abord** : le find naïf (boucle while) suffit pour commencer
+2. **Tester après chaque étape** : `make test` à chaque fois
+3. **Étape 2 = motivation** : comprendre le problème avant de l'optimiser
+4. **Étape 3 = une seule ligne** : `parent[x] = find(parent[x])`
+5. **Étape 5 utilise tout** : si les étapes 1-4 marchent, Kruskal est facile
+6. **Dessiner le graphe** : tracer le MST à la main d'abord
+7. **Pour le debug** : afficher `parent[]` après chaque `unite()`
 
 ---
 
-**Bonne chance !**
+**Bon courage !**

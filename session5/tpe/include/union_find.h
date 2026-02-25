@@ -1,14 +1,15 @@
 /**
  * @file union_find.h
- * @brief Structure Union-Find (Disjoint Set Union) avec compression et rang
+ * @brief Structure Union-Find (Disjoint Set Union)
  *
  * TPE5 - Théorie des Graphes (GI2)
  * ESGC VERECHAGUINE A.K. - 2025-2026
  *
- * Opérations :
- *   - find(x)        : trouve le représentant de l'ensemble contenant x
- *   - unite(x, y)    : fusionne les ensembles contenant x et y
- *   - connected(x, y): vérifie si x et y sont dans le même ensemble
+ * Progression en 6 étapes :
+ *   Étape 1 : Version naïve (find, unite, connected)
+ *   Étape 2 : Mesurer le problème (count_operations)
+ *   Étape 3 : Compression de chemin (modifier find)
+ *   Étape 4 : Union par rang (modifier unite)
  */
 
 #ifndef UNION_FIND_H
@@ -18,23 +19,29 @@
 
 class UnionFind {
 private:
-    std::vector<int> parent;
-    std::vector<int> rank_;
+    std::vector<int> parent;    // parent[i] = chef de i
+    std::vector<int> rank_;     // rank_[i] = hauteur estimée (étape 4)
 
 public:
     // Constructeur : crée n ensembles disjoints {0}, {1}, ..., {n-1}
     UnionFind(int n);
 
     // Trouve le représentant (racine) de l'ensemble contenant x
-    // Avec compression de chemin
+    // Étape 1 : version naïve (boucle while)
+    // Étape 3 : version avec compression de chemin
     int find(int x);
 
     // Fusionne les ensembles contenant x et y
-    // Union par rang
+    // Étape 1 : version naïve (parent[ry] = rx)
+    // Étape 4 : version avec union par rang
     void unite(int x, int y);
 
     // Vérifie si x et y sont dans le même ensemble
     bool connected(int x, int y);
+
+    // Étape 2 : compter le nombre de remontées de find(x)
+    // (sans modifier parent[] — juste compter)
+    int count_operations(int x);
 
     // Accesseur pour les tests (lecture seule)
     int getParent(int x) const;

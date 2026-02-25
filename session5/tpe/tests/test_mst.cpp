@@ -5,10 +5,10 @@
  * TPE5 - Théorie des Graphes (GI2)
  * ESGC VERECHAGUINE A.K. - 2025-2026
  *
- * 16 tests organisés par étape (1 à 5)
+ * 20 tests organisés par étape (1 à 6)
  *
- * Valeurs attendues calculées à la main :
- *   graph_test.txt    : MST poids = 35, arêtes = {(0,2,3),(0,3,5),(2,4,5),(3,5,6),(0,1,7),(4,6,9)}
+ * Valeurs attendues :
+ *   graph_test.txt    : MST poids = 35, arêtes = 6
  *   graph_commune.txt : MST poids = 44, arêtes = 9
  */
 
@@ -21,7 +21,7 @@
 
 using namespace std;
 
-// Couleurs pour l'affichage
+// Couleurs
 #define GREEN "\033[0;32m"
 #define RED "\033[0;31m"
 #define BLUE "\033[0;34m"
@@ -34,209 +34,244 @@ int tests_total = 0;
 void test_result(const string& name, bool passed) {
     tests_total++;
     if (passed) {
-        cout << "  " GREEN "✅" RESET " Test " << tests_total << " : " << name << "\n";
+        cout << "  " GREEN "[PASS]" RESET " " << name << "\n";
         tests_passed++;
     } else {
-        cout << "  " RED "❌" RESET " Test " << tests_total << " : " << name << "\n";
+        cout << "  " RED "[FAIL]" RESET " " << name << "\n";
     }
 }
 
 // ============================================================
-// ÉTAPE 1 : UNION-FIND — CONSTRUCTEUR & FIND (3 tests)
+// ÉTAPE 1 : Union-Find naïf (5 tests)
 // ============================================================
 
 void test_etape_1() {
-    cout << "\n" YELLOW "=== ÉTAPE 1 : UNION-FIND — CONSTRUCTEUR & FIND ===" RESET "\n";
+    cout << "\n" YELLOW "--- Étape 1 : Union-Find naïf ---" RESET "\n";
 
-    // Test 1 : Constructeur initialise parent[i] = i
+    // Test 1
     {
-        UnionFind uf(5);
+        UnionFind uf(7);
         bool ok = true;
-        for (int i = 0; i < 5; i++) {
-            if (uf.getParent(i) != i) ok = false;
-        }
-        test_result("Constructeur : parent[i] == i pour 5 éléments", ok);
-    }
-
-    // Test 2 : find(i) == i pour tout i initialement
-    {
-        UnionFind uf(5);
-        bool ok = true;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 7; i++) {
             if (uf.find(i) != i) ok = false;
         }
-        test_result("find(i) == i initialement pour tout i", ok);
+        test_result("test_uf_create_find_self", ok);
     }
 
-    // Test 3 : Éléments distincts non connectés initialement
+    // Test 2
     {
-        UnionFind uf(5);
-        bool ok = (!uf.connected(0, 4) && !uf.connected(1, 3) && !uf.connected(2, 4));
-        test_result("Éléments distincts non connectés initialement", ok);
+        UnionFind uf(7);
+        bool ok = !uf.connected(0, 1);
+        test_result("test_uf_create_not_connected", ok);
     }
-}
 
-// ============================================================
-// ÉTAPE 2 : UNION-FIND — UNITE & CONNECTED (4 tests)
-// ============================================================
-
-void test_etape_2() {
-    cout << "\n" YELLOW "=== ÉTAPE 2 : UNION-FIND — UNITE & CONNECTED ===" RESET "\n";
-
-    // Test 4 : unite(0,1) → connected(0,1) == true
+    // Test 3
     {
-        UnionFind uf(5);
+        UnionFind uf(7);
+        bool ok = (uf.find(3) == 3);
+        test_result("test_uf_find_singleton", ok);
+    }
+
+    // Test 4
+    {
+        UnionFind uf(7);
         uf.unite(0, 1);
         bool ok = uf.connected(0, 1);
-        test_result("unite(0,1) → connected(0,1) == true", ok);
+        test_result("test_uf_unite_basic", ok);
     }
 
-    // Test 5 : Transitivité : unite(0,1), unite(1,2) → connected(0,2)
+    // Test 5
     {
-        UnionFind uf(5);
+        UnionFind uf(7);
         uf.unite(0, 1);
         uf.unite(1, 2);
         bool ok = uf.connected(0, 2);
-        test_result("Transitivité : unite(0,1), unite(1,2) → connected(0,2)", ok);
+        test_result("test_uf_unite_transitive", ok);
+    }
+}
+
+// ============================================================
+// ÉTAPE 2 : Mesurer le problème (2 tests)
+// ============================================================
+
+void test_etape_2() {
+    cout << "\n" YELLOW "--- Étape 2 : Mesurer le problème ---" RESET "\n";
+
+    // Test 6 : count_operations(0) == 0 sur singleton
+    {
+        UnionFind uf(5);
+        bool ok = (uf.count_operations(0) == 0);
+        test_result("test_count_ops_singleton", ok);
     }
 
-    // Test 6 : Multiple unions : unite(0,1), unite(2,3), unite(0,2) → connected(1,3)
+    // Test 7 : Chaîne de 10 éléments — adaptatif (naïf OU rang)
+    //   Avec naïf : chaîne se forme, ops = 9 → (9 >= 8) passe
+    //   Avec rang  : arbre plat, ops ≈ 1  → (1 <= 2) passe
+    {
+        UnionFind uf(10);
+        for (int i = 8; i >= 0; i--)
+            uf.unite(i, i + 1);
+        // Prérequis : tous doivent être connectés
+        bool chain_ok = uf.connected(0, 9);
+        int ops = uf.count_operations(9);
+        bool ok = chain_ok && ((ops >= 8) || (ops <= 2));
+        test_result("test_count_ops_chain", ok);
+    }
+}
+
+// ============================================================
+// ÉTAPE 3 : Compression de chemin (3 tests)
+// ============================================================
+
+void test_etape_3() {
+    cout << "\n" YELLOW "--- Étape 3 : Compression de chemin ---" RESET "\n";
+
+    // Test 8 : Après find(9), count_operations(9) <= 1
+    {
+        UnionFind uf(10);
+        for (int i = 8; i >= 0; i--)
+            uf.unite(i, i + 1);
+        bool chain_ok = uf.connected(0, 9);
+        uf.find(9); // déclenche la compression
+        int ops = uf.count_operations(9);
+        bool ok = chain_ok && (ops <= 1);
+        test_result("test_compression_effective", ok);
+    }
+
+    // Test 9 : Après find(9), getParent(9) pointe vers la racine
+    {
+        UnionFind uf(10);
+        for (int i = 8; i >= 0; i--)
+            uf.unite(i, i + 1);
+        bool chain_ok = uf.connected(0, 9);
+        int root = uf.find(9);
+        bool ok = chain_ok && (uf.getParent(9) == root);
+        test_result("test_compression_flattens_all", ok);
+    }
+
+    // Test 10 : Après unite(0,1), find(0) == find(1)
     {
         UnionFind uf(5);
         uf.unite(0, 1);
+        bool ok = (uf.find(0) == uf.find(1));
+        test_result("test_find_same_root_after_unite", ok);
+    }
+}
+
+// ============================================================
+// ÉTAPE 4 : Union par rang (2 tests)
+// ============================================================
+
+void test_etape_4() {
+    cout << "\n" YELLOW "--- Étape 4 : Union par rang ---" RESET "\n";
+
+    // Test 11 : 8 éléments, unions par paires → hauteur <= 3
+    {
+        UnionFind uf(8);
+        uf.unite(0, 1);
         uf.unite(2, 3);
+        uf.unite(4, 5);
+        uf.unite(6, 7);
         uf.unite(0, 2);
-        bool ok = uf.connected(1, 3);
-        test_result("Chaîne d'unions : connected(1,3) après unite(0,1)(2,3)(0,2)", ok);
+        uf.unite(4, 6);
+        uf.unite(0, 4);
+
+        bool all_ok = uf.connected(0, 7);
+        bool ok = all_ok && (uf.count_operations(7) <= 3);
+        test_result("test_rank_balanced_tree", ok);
     }
 
-    // Test 7 : Compression de chemin — après find, parent pointe vers racine
+    // Test 12 : unite quand déjà connectés ne corrompt pas
     {
         UnionFind uf(5);
         uf.unite(0, 1);
         uf.unite(1, 2);
-        uf.unite(2, 3);
-        uf.unite(3, 4);
-        // Après find(4), la compression devrait aplatir le chemin
-        int root = uf.find(4);
-        bool ok = (uf.find(0) == root && uf.find(1) == root &&
-                   uf.find(2) == root && uf.find(3) == root &&
-                   uf.find(4) == root);
-        test_result("Compression : tous les éléments pointent vers la même racine", ok);
+        bool before = uf.connected(0, 2);
+        int root_before = uf.find(0);
+        uf.unite(0, 2); // déjà connectés !
+        int root_after = uf.find(0);
+        bool ok = before && (root_before == root_after) && uf.connected(0, 1);
+        test_result("test_unite_same_noop", ok);
     }
 }
 
 // ============================================================
-// ÉTAPE 3 : EXTRACTION DES ARÊTES (2 tests)
+// ÉTAPE 5 : Algorithme de Kruskal (5 tests)
 // ============================================================
 
-void test_etape_3() {
-    cout << "\n" YELLOW "=== ÉTAPE 3 : EXTRACTION DES ARÊTES ===" RESET "\n";
+void test_etape_5() {
+    cout << "\n" YELLOW "--- Étape 5 : Algorithme de Kruskal ---" RESET "\n";
 
-    Graph g = Graph::loadFromFile("data/graph_test.txt");
-
-    // Test 8 : getEdges retourne 11 arêtes
+    // Test 13
     {
-        auto edges = getEdges(g);
-        bool ok = (edges.size() == 11);
-        test_result("getEdges(graph_test) retourne 11 arêtes", ok);
+        Graph g = Graph::loadFromFile("data/graph_test.txt");
+        auto mst = kruskal(g);
+        bool ok = (mstWeight(mst) == 35);
+        test_result("test_kruskal_weight", ok);
     }
 
-    // Test 9 : Pas de doublons — chaque paire (u,v) apparaît une seule fois
-    {
-        auto edges = getEdges(g);
-        bool no_dup = true;
-        for (size_t i = 0; i < edges.size() && no_dup; i++) {
-            for (size_t j = i + 1; j < edges.size() && no_dup; j++) {
-                int a_min = min(edges[i].src, edges[i].dest);
-                int a_max = max(edges[i].src, edges[i].dest);
-                int b_min = min(edges[j].src, edges[j].dest);
-                int b_max = max(edges[j].src, edges[j].dest);
-                if (a_min == b_min && a_max == b_max) no_dup = false;
-            }
-        }
-        bool ok = (no_dup && !edges.empty());
-        test_result("Pas de doublons : chaque arête apparaît une seule fois", ok);
-    }
-}
-
-// ============================================================
-// ÉTAPE 4 : ALGORITHME DE KRUSKAL (4 tests)
-// ============================================================
-
-void test_etape_4() {
-    cout << "\n" YELLOW "=== ÉTAPE 4 : ALGORITHME DE KRUSKAL ===" RESET "\n";
-
-    // Test 10 : Kruskal graph_test → exactement V-1 = 6 arêtes
+    // Test 14
     {
         Graph g = Graph::loadFromFile("data/graph_test.txt");
         auto mst = kruskal(g);
         bool ok = ((int)mst.size() == g.getVertexCount() - 1);
-        test_result("Kruskal graph_test : exactement V-1 = 6 arêtes", ok);
+        test_result("test_kruskal_edge_count", ok);
     }
 
-    // Test 11 : Kruskal graph_test → poids total = 35
+    // Test 15
+    {
+        Graph g(2);
+        g.addEdge(0, 1, 5);
+        auto mst = kruskal(g);
+        bool ok = ((int)mst.size() == 1 && mstWeight(mst) == 5);
+        test_result("test_kruskal_trivial", ok);
+    }
+
+    // Test 16
+    {
+        Graph gc = Graph::loadFromFile("data/graph_commune.txt");
+        auto mst = kruskal(gc);
+        bool ok = (mstWeight(mst) == 44);
+        test_result("test_kruskal_commune", ok);
+    }
+
+    // Test 17
     {
         Graph g = Graph::loadFromFile("data/graph_test.txt");
-        auto mst = kruskal(g);
-        int w = mstWeight(mst);
-        bool ok = (w == 35);
-        test_result("Kruskal graph_test : poids total = 35", ok);
-    }
-
-    // Test 12 : Kruskal graph_commune → exactement V-1 = 9 arêtes
-    {
-        Graph gc = Graph::loadFromFile("data/graph_commune.txt");
-        auto mst = kruskal(gc);
-        bool ok = ((int)mst.size() == gc.getVertexCount() - 1);
-        test_result("Kruskal graph_commune : exactement V-1 = 9 arêtes", ok);
-    }
-
-    // Test 13 : Kruskal graph_commune → poids total = 44
-    {
-        Graph gc = Graph::loadFromFile("data/graph_commune.txt");
-        auto mst = kruskal(gc);
-        int w = mstWeight(mst);
-        bool ok = (w == 44);
-        test_result("Kruskal graph_commune : poids total = 44", ok);
+        auto edges = getEdges(g);
+        bool ok = ((int)edges.size() == 11);
+        test_result("test_getEdges_no_duplicates", ok);
     }
 }
 
 // ============================================================
-// ÉTAPE 5 : UTILITAIRES ET CAS LIMITES (3 tests)
+// ÉTAPE 6 : Utilitaires (3 tests)
 // ============================================================
 
-void test_etape_5() {
-    cout << "\n" YELLOW "=== ÉTAPE 5 : UTILITAIRES ET CAS LIMITES ===" RESET "\n";
+void test_etape_6() {
+    cout << "\n" YELLOW "--- Étape 6 : Utilitaires ---" RESET "\n";
 
-    // Test 14 : mstWeight sur un MST connu = 15
+    // Test 18
     {
-        vector<Edge> edges = {{0, 1, 3}, {1, 2, 5}, {2, 3, 7}};
-        int w = mstWeight(edges);
-        bool ok = (w == 15);
-        test_result("mstWeight({3,5,7}) = 15", ok);
+        vector<Edge> empty;
+        bool ok = (mstWeight(empty) == 0);
+        test_result("test_mstWeight_empty", ok);
     }
 
-    // Test 15 : Graphe complet K3 → MST = 2 arêtes, poids = 3
+    // Test 19
     {
-        Graph k3(3);
-        k3.addEdge(0, 1, 1);
-        k3.addEdge(0, 2, 3);
-        k3.addEdge(1, 2, 2);
-        auto mst = kruskal(k3);
-        bool ok = ((int)mst.size() == 2 && mstWeight(mst) == 3);
-        test_result("K3 : MST = 2 arêtes, poids = 3", ok);
+        Graph g = Graph::loadFromFile("data/graph_test.txt");
+        auto mst = kruskal(g);
+        printMST(mst, g);
+        test_result("test_printMST_no_crash", true);
     }
 
-    // Test 16 : Graphe déconnecté → forêt couvrante (< V-1 arêtes)
+    // Test 20
     {
-        Graph disc(4);
-        disc.addEdge(0, 1, 5);
-        disc.addEdge(2, 3, 7);
-        // 2 composantes : {0,1} et {2,3}
-        auto mst = kruskal(disc);
-        bool ok = ((int)mst.size() == 2 && mstWeight(mst) == 12);
-        test_result("Graphe déconnecté : forêt = 2 arêtes, poids = 12", ok);
+        Graph g(3);
+        vector<Edge> empty;
+        printMST(empty, g);
+        test_result("test_printMST_empty_no_crash", true);
     }
 }
 
@@ -245,45 +280,36 @@ void test_etape_5() {
 // ============================================================
 
 int main() {
-    cout << BLUE "═══════════════════════════════════════════════\n";
-    cout << "  TESTS TPE5 - KRUSKAL & UNION-FIND\n";
-    cout << "═══════════════════════════════════════════════" RESET "\n";
+    cout << BLUE "=== TPE5 : Tests MST (Kruskal & Union-Find) ===" RESET "\n";
 
     test_etape_1();
-    int etape1 = tests_passed;
+    int e1 = tests_passed;
 
     test_etape_2();
-    int etape2 = tests_passed - etape1;
+    int e2 = tests_passed - e1;
 
     test_etape_3();
-    int etape3 = tests_passed - etape1 - etape2;
+    int e3 = tests_passed - e1 - e2;
 
     test_etape_4();
-    int etape4 = tests_passed - etape1 - etape2 - etape3;
+    int e4 = tests_passed - e1 - e2 - e3;
 
     test_etape_5();
-    int etape5 = tests_passed - etape1 - etape2 - etape3 - etape4;
+    int e5 = tests_passed - e1 - e2 - e3 - e4;
 
-    // Résumé final
-    cout << "\n" BLUE "═══════════════════════════════════════════════" RESET "\n";
-    cout << "  RÉSUMÉ PAR ÉTAPE :\n";
-    cout << "    Étape 1 (UF constructeur)  : " << etape1 << "/3\n";
-    cout << "    Étape 2 (UF opérations)    : " << etape2 << "/4\n";
-    cout << "    Étape 3 (Extraction arêtes): " << etape3 << "/2\n";
-    cout << "    Étape 4 (Kruskal)          : " << etape4 << "/4\n";
-    cout << "    Étape 5 (Utilitaires)      : " << etape5 << "/3\n";
-    cout << "\n  TOTAL : " << tests_passed << "/" << tests_total << " tests passés\n";
+    test_etape_6();
+    int e6 = tests_passed - e1 - e2 - e3 - e4 - e5;
 
-    // Estimation note
-    int score = 0;
-    score += (etape1 * 4) / 3;     // 4 pts max
-    score += (etape2 * 4) / 4;     // 4 pts max
-    score += (etape3 * 4) / 2;     // 4 pts max
-    score += (etape4 * 8) / 4;     // 8 pts max
-    score += (etape5 * 3) / 3;     // 3 pts max
+    // Résumé
+    cout << "\n" BLUE "===============================================" RESET "\n";
+    cout << "  Étape 1 (UF naïf)          : " << e1 << "/5\n";
+    cout << "  Étape 2 (count_operations)  : " << e2 << "/2\n";
+    cout << "  Étape 3 (Compression)       : " << e3 << "/3\n";
+    cout << "  Étape 4 (Union par rang)    : " << e4 << "/2\n";
+    cout << "  Étape 5 (Kruskal)           : " << e5 << "/5\n";
+    cout << "  Étape 6 (Utilitaires)       : " << e6 << "/3\n";
 
-    cout << "  NOTE ESTIMÉE : " << score << "/25 pts (+ qualité code : +2 pts)\n";
-    cout << BLUE "═══════════════════════════════════════════════" RESET "\n";
+    cout << "\n" BLUE "=== Résultat : " << tests_passed << "/20 tests réussis ===" RESET "\n";
 
     return (tests_passed == tests_total) ? 0 : 1;
 }

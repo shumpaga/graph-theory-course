@@ -9,10 +9,10 @@
  * PRENOM :
  *
  * 4 fonctions à implémenter :
- *   - getEdges()  : extraction des arêtes
- *   - kruskal()   : algorithme de Kruskal
- *   - mstWeight() : poids total du MST
- *   - printMST()  : affichage du MST
+ *   - getEdges()  : extraction des arêtes (étape 5)
+ *   - kruskal()   : algorithme de Kruskal (étape 5)
+ *   - mstWeight() : poids total du MST (étape 6)
+ *   - printMST()  : affichage du MST (étape 6)
  */
 
 #include "mst.h"
@@ -23,7 +23,7 @@
 using namespace std;
 
 // ============================================================
-// ÉTAPE 3 : EXTRACTION DES ARÊTES (4 pts)
+// ÉTAPE 5 : EXTRACTION DES ARÊTES (étape 5, partie de 7 pts)
 // ============================================================
 
 vector<Edge> getEdges(const Graph& g) {
@@ -45,11 +45,11 @@ vector<Edge> getEdges(const Graph& g) {
     //   retourner edges
 
     (void)g;
-    return {}; // À remplacer
+    return {}; // placeholder — à remplacer
 }
 
 // ============================================================
-// ÉTAPE 4 : ALGORITHME DE KRUSKAL (8 pts)
+// ÉTAPE 5 : ALGORITHME DE KRUSKAL (étape 5, partie de 7 pts)
 // ============================================================
 
 vector<Edge> kruskal(const Graph& g) {
@@ -71,11 +71,11 @@ vector<Edge> kruskal(const Graph& g) {
     //   6. Retourner mst
 
     (void)g;
-    return {}; // À remplacer
+    return {}; // placeholder — à remplacer
 }
 
 // ============================================================
-// ÉTAPE 5 : POIDS TOTAL DU MST (1.5 pts)
+// ÉTAPE 6 : POIDS TOTAL DU MST (étape 6, partie de 2 pts)
 // ============================================================
 
 int mstWeight(const vector<Edge>& mst) {
@@ -88,11 +88,11 @@ int mstWeight(const vector<Edge>& mst) {
     //   retourner total
 
     (void)mst;
-    return 0; // À remplacer
+    return 0; // placeholder — à remplacer
 }
 
 // ============================================================
-// ÉTAPE 5 : AFFICHAGE DU MST (1.5 pts)
+// ÉTAPE 6 : AFFICHAGE DU MST (étape 6, partie de 2 pts)
 // ============================================================
 
 void printMST(const vector<Edge>& mst, const Graph& g) {
