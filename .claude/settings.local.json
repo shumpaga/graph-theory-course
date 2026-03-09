@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(command find . -type f)",
+      "Bash(make clean)",
+      "Bash(make)",
+      "Bash(make test)",
+      "Bash(./bin/main)",
+      "Bash(make help)",
+      "Bash(gtimeout 3 ./bin/main)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(perl -e 'alarm 3; exec @ARGV' ./bin/main)"
+    ]
+  }
+}
